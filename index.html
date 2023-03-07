@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Transcript Parser</title>
+</head>
+<body>
+  <h1>Transcript Parser</h1>
+  <form>
+    <label for="transcript-file">Select a .vtt file:</label>
+    <input type="file" id="transcript-file">
+    <br>
+    <button type="button" onclick="tarseTranscript()">Parse transcript</button>
+  </form>
+  <br>
+  <pre id="parsed-text"></pre>
+  
+  <script>
+    function tarseTranscript() {
+      // Get the transcript
+      const fileInput = document.getElementById("transcript-file");
+      const file = fileInput.files[0];
+
+      // Create a FileReader to read the file contents
+      const reader = new FileReader();
+
+      // Set up an onload event handler for when the file is loaded
+      reader.onload = function(event) {
+        // Get the file contents as a string
+        const contents = event.target.result;
+
+        // Remove text that matches the regex pattern
+        const patternForTimes = /\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}/g;
+        const patternForGuids = /([a-fA-F\d]{8}(-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}-\d+)/g;
+        const patternForEmptyLines = /^\s*$/gm;
+
+        const parsedText = contents.replace(patternForTimes, "").replace(patternForGuids, "").replace(patternForEmptyLines, "");
+
+        // Display the parsed text in the pre element
+        const parsedTextElement = document.getElementById("parsed-text");
+        parsedTextElement.textContent = parsedText;
+      };
+
+      // Read the file as text
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
