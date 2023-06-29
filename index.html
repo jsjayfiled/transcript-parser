@@ -8,21 +8,41 @@
   <h1>Transcript Parser</h1>
   <form>
     <label for="transcript-file">Select a .vtt file:</label>
+    <br>
+    <br>
     <input type="file" id="transcript-file">
     <br>
-    <button type="button" onclick="tarseTranscript()">Parse transcript</button>
+    <br>
+    <button type="button" onclick="ParseTranscript()">Parse transcript</button>
+    <br>
+    <br>
+    <button id="copy-button">Copy Parsed Text 😏</button>
   </form>
   <br>
   <pre id="parsed-text"></pre>
   
   <script>
-    function tarseTranscript() {
+    function ParseTranscript() {
       // Get the transcript
       const fileInput = document.getElementById("transcript-file");
       const file = fileInput.files[0];
+      const parsedTextElement = document.getElementById("parsed-text");
 
       // Create a FileReader to read the file contents
       const reader = new FileReader();
+
+      const copyButton = document.getElementById('copy-button');
+
+      copyButton.addEventListener('click', () => {
+
+        
+        navigator.clipboard.writeText(parsedTextElement.textContent).then(() => {
+          alert('Copied to clipboard');
+        }).catch((error) => {
+          console.error('Failed to copy to clipboard', error);
+        })
+
+      })
 
       // Set up an onload event handler for when the file is loaded
       reader.onload = function(event) {
@@ -33,11 +53,13 @@
         const patternForTimes = /\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}/g;
         const patternForGuids = /([a-fA-F\d]{8}(-[a-fA-F\d]{4}){3}-[a-fA-F\d]{12}-\d+)/g;
         const patternForEmptyLines = /^\s*$/gm;
+        const patternForMeetingRooms = /<v CHAD-[^>]+>|<\/v>/g
 
-        const parsedText = contents.replace(patternForTimes, "").replace(patternForGuids, "").replace(patternForEmptyLines, "");
+
+        const parsedText = contents.replace(patternForTimes, "").replace(patternForGuids, "").replace(patternForEmptyLines, "").replace(patternForMeetingRooms, "");
 
         // Display the parsed text in the pre element
-        const parsedTextElement = document.getElementById("parsed-text");
+        // const parsedTextElement = document.getElementById("parsed-text");
         parsedTextElement.textContent = parsedText;
       };
 
